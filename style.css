@@ -1,0 +1,112 @@
+:root {
+  --bg: #f6f1e7; --ink: #1f2a44; --muted: #6b7280; --card: #ffffff; --line: #e5ddcc;
+  --accent: #c0392b; --accent-ink: #fff; --ok: #2e7d5b; --warn: #d98b1a; --bad: #c0392b; --info: #2f6db3;
+  --radius: 16px; --shadow: 0 6px 20px rgba(31, 42, 68, .08);
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans JP", sans-serif;
+  --jp: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.5 var(--font); min-height: 100vh; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+a { color: var(--info); }
+h1, h2, h3, h4 { margin: .2em 0 .4em; line-height: 1.25; }
+.wrap { max-width: 520px; margin: 0 auto; padding: 16px 16px calc(24px + env(safe-area-inset-bottom)); }
+.wrap.wide { max-width: 860px; }
+.center { text-align: center; }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
+.err { color: var(--bad); min-height: 1.5em; margin: 0; }
+.banner { background: #fff4d6; color: #6b4e00; font-size: 13px; text-align: center; padding: 6px 12px; border-bottom: 1px solid #f0dca0; }
+.logo { width: 72px; height: 72px; margin-top: 24px; }
+.card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+.form { display: grid; gap: 12px; text-align: left; margin: 16px 0; }
+.form label { display: grid; gap: 4px; font-weight: 600; font-size: 14px; }
+input { font: inherit; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink); width: 100%; }
+input:focus { outline: 2px solid var(--info); outline-offset: 1px; }
+.btn { font: inherit; border: 0; border-radius: 12px; padding: 10px 16px; cursor: pointer; background: #ece6d8; color: var(--ink); font-weight: 600; touch-action: manipulation; }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); }
+.btn.ghost { background: transparent; border: 1px solid var(--line); }
+.btn.small { padding: 6px 12px; font-size: 14px; }
+.btn.big { width: 100%; padding: 16px; font-size: 18px; }
+.row { display: flex; gap: 8px; justify-content: flex-end; }
+.chip { display: inline-block; padding: 2px 10px; border-radius: 999px; background: #ece6d8; font-size: 13px; font-weight: 700; }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; margin: 16px 0; }
+.stat { background: var(--card); border-radius: 12px; padding: 10px; text-align: center; box-shadow: var(--shadow); }
+.stat b { display: block; font-size: 24px; }
+.stat span { font-size: 12px; color: var(--muted); }
+.hero { margin-bottom: 8px; }
+.hero-teen { display: flex; align-items: center; gap: 16px; }
+.hero-teen p { margin: 0; }
+.flame { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-size: 22px; font-weight: 800; background: #ece6d8; color: var(--muted); flex: none; }
+.flame.on { background: radial-gradient(circle at 50% 70%, #ffd34d, #ff7a2e 60%, #e0412c); color: #fff; box-shadow: 0 0 0 4px rgba(255, 122, 46, .2); }
+
+/* Ôn thẻ */
+.progress { flex: 1; height: 8px; background: #ece6d8; border-radius: 999px; overflow: hidden; }
+#prog-bar { height: 100%; width: 0; background: var(--ok); transition: width .25s; }
+.flash { position: relative; min-height: 320px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; cursor: pointer; user-select: none; }
+.pic { font-size: 96px; line-height: 1.1; }
+.front { font-family: var(--jp); font-size: 64px; font-weight: 700; line-height: 1.2; word-break: keep-all; }
+.back { border-top: 1px dashed var(--line); padding-top: 12px; width: 100%; }
+.read { font-size: 20px; color: var(--muted); letter-spacing: .05em; }
+.mean { font-size: 24px; font-weight: 700; }
+.ex { font-size: 15px; color: var(--muted); margin-top: 6px; }
+.speak { position: absolute; top: 10px; right: 10px; font-size: 14px; }
+.actions { margin-top: 16px; }
+.rate4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.rate4 .btn { display: grid; gap: 2px; padding: 12px 4px; color: #fff; }
+.rate4 small { font-size: 11px; opacity: .85; font-weight: 500; }
+.rate4 i { font-style: normal; font-size: 12px; opacity: .95; min-height: 1em; }
+.r1 { background: var(--bad); } .r2 { background: var(--warn); } .r3 { background: var(--ok); } .r4 { background: var(--info); }
+.rate2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.rate2 .btn { font-size: 22px; padding: 26px 8px; border-radius: 20px; color: #fff; }
+.kno { background: #f08a5d; } .kyes { background: #3fb37f; }
+
+/* Xong phiên */
+.done-art { font-size: 96px; margin: 32px 0 8px; display: flex; justify-content: center; }
+.kid-art { animation: pop .6s ease-out; }
+.teen-art .flame { width: 96px; height: 96px; font-size: 36px; }
+@keyframes pop { 0% { transform: scale(.2) rotate(-20deg); } 70% { transform: scale(1.2) rotate(8deg); } 100% { transform: scale(1); } }
+
+/* Hộ chiếu (HV nhỏ tuổi) */
+.passport { margin-top: 20px; background: #fff; border: 2px dashed #f2b8c6; border-radius: 20px; padding: 14px; }
+.passport h3 { font-size: 16px; margin-top: 0; }
+.stamps { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 8px; }
+.stamp { display: grid; place-items: center; font-size: 30px; background: #fff7fa; border-radius: 14px; padding: 6px 0; }
+.stamp small { font-size: 10px; color: var(--muted); }
+
+/* Giao diện teen: chủ đề anime đêm */
+body.teen { --bg: #141a2e; --ink: #f2f4fb; --muted: #a3acc7; --card: #1f2742; --line: #34406a; --accent: #ff4f8b; --shadow: 0 8px 24px rgba(0,0,0,.35); background: radial-gradient(1200px 600px at 80% -10%, #3b2a6b 0%, transparent 60%), radial-gradient(900px 500px at -10% 110%, #6b2a4f 0%, transparent 55%), var(--bg); background-attachment: fixed; }
+body.teen .btn { background: #2a3456; color: var(--ink); }
+body.teen .btn.primary { background: linear-gradient(135deg, #ff4f8b, #8a5cff); color: #fff; }
+body.teen .btn.ghost { background: transparent; }
+body.teen .chip, body.teen .progress, body.teen .flame { background: #2a3456; }
+body.teen .flash { background: linear-gradient(160deg, #222c4d, #1a2140); border: 1px solid #34406a; }
+body.teen .front { text-shadow: 0 0 18px rgba(255, 79, 139, .45); }
+body.teen .rate4 .r1 { background: #e0446a; } body.teen .rate4 .r2 { background: #d9822b; } body.teen .rate4 .r3 { background: #2f9e6e; } body.teen .rate4 .r4 { background: #4a7bd9; }
+body.teen input { background: #1a2140; border-color: var(--line); color: var(--ink); }
+
+/* Giao diện trẻ nhỏ: sáng, tròn, chữ to */
+body.kid { --bg: #fff8ec; --accent: #ff8a3d; --radius: 28px; font-size: 18px; }
+body.kid .hero-kid { text-align: center; }
+body.kid .big-emoji { font-size: 80px; }
+body.kid .hero-kid p { font-size: 20px; font-weight: 700; margin: 0; }
+body.kid .front { font-size: 56px; color: #5a3e2b; }
+body.kid .pic { font-size: 120px; }
+body.kid .btn.big { font-size: 22px; border-radius: 22px; }
+
+/* Trang giáo viên */
+.tcard { margin-bottom: 16px; }
+.bars { display: grid; grid-template-columns: repeat(14, 1fr); gap: 3px; height: 90px; align-items: end; margin: 8px 0 12px; }
+.bar { height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 2px; }
+.bar span { display: block; width: 100%; background: var(--ok); border-radius: 4px 4px 0 0; min-height: 2px; }
+.bar small { font-size: 10px; color: var(--muted); }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+td.jp { font-family: var(--jp); font-size: 20px; }
+.sum { white-space: pre-wrap; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px; font-size: 13px; margin-top: 12px; overflow-x: auto; }
+dialog { border: 0; border-radius: var(--radius); box-shadow: var(--shadow); max-width: 92vw; width: 460px; }
+dialog::backdrop { background: rgba(0,0,0,.35); }
+@media (max-width: 380px) { .front { font-size: 52px; } .rate4 .btn { padding: 10px 2px; font-size: 14px; } }

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Hinoki Learn</title>
+  <meta name="theme-color" content="#1f2a44">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Hinoki Learn">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="banner" class="banner" hidden></div>
+
+  <!-- Đăng nhập -->
+  <section id="v-login" class="view">
+    <div class="wrap center">
+      <img src="icons/icon.svg" alt="" class="logo">
+      <h1>Hinoki Learn</h1>
+      <p class="muted">Ôn tiếng Nhật mỗi ngày 5-10 phút</p>
+      <form id="f-login" class="card form" autocomplete="off">
+        <label>Mã học viên
+          <input id="in-ma" inputmode="text" placeholder="HV01" maxlength="6" required autocapitalize="characters">
+        </label>
+        <label>Mã PIN (4 số)
+          <input id="in-pin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="••••" required>
+        </label>
+        <button class="btn primary big" type="submit">Vào học</button>
+        <p id="login-err" class="err" role="alert"></p>
+      </form>
+      <p class="small"><a href="#giao-vien">Trang giáo viên</a> · <a href="#" id="lnk-server">Cài đặt máy chủ</a></p>
+    </div>
+  </section>
+
+  <!-- Trang chủ học viên -->
+  <section id="v-home" class="view" hidden>
+    <div class="wrap">
+      <header class="top">
+        <span id="home-ma" class="chip"></span>
+        <button id="btn-logout" class="btn ghost small">Đăng xuất</button>
+      </header>
+      <div id="home-hero" class="hero card"></div>
+      <div class="stats">
+        <div class="stat"><b id="st-due">0</b><span>thẻ cần ôn</span></div>
+        <div class="stat"><b id="st-new">0</b><span>thẻ mới</span></div>
+        <div class="stat"><b id="st-streak">0</b><span>ngày liên tục</span></div>
+      </div>
+      <button id="btn-start" class="btn primary big">Bắt đầu ôn</button>
+      <p id="home-note" class="muted center"></p>
+      <div id="passport" class="passport" hidden></div>
+    </div>
+  </section>
+
+  <!-- Ôn thẻ -->
+  <section id="v-review" class="view" hidden>
+    <div class="wrap">
+      <header class="top">
+        <button id="btn-quit" class="btn ghost small">Dừng</button>
+        <div class="progress"><div id="prog-bar"></div></div>
+        <span id="prog-txt" class="small"></span>
+      </header>
+      <div id="flash" class="flash card" tabindex="0">
+        <div id="c-pic" class="pic"></div>
+        <div id="c-front" class="front"></div>
+        <div id="c-back" class="back" hidden>
+          <div id="c-read" class="read"></div>
+          <div id="c-mean" class="mean"></div>
+          <div id="c-ex" class="ex"></div>
+        </div>
+        <button id="btn-speak" class="btn ghost speak" aria-label="Nghe phát âm">Nghe</button>
+      </div>
+      <div id="act-flip" class="actions">
+        <button id="btn-flip" class="btn primary big">Lật thẻ</button>
+      </div>
+      <div id="act-rate4" class="actions rate4" hidden>
+        <button class="btn r1" data-r="1"><b>Quên</b><small>Again</small><i></i></button>
+        <button class="btn r2" data-r="2"><b>Khó</b><small>Hard</small><i></i></button>
+        <button class="btn r3" data-r="3"><b>Được</b><small>Good</small><i></i></button>
+        <button class="btn r4" data-r="4"><b>Dễ</b><small>Easy</small><i></i></button>
+      </div>
+      <div id="act-rate2" class="actions rate2" hidden>
+        <button class="btn kno" data-r="1">Chưa nhớ</button>
+        <button class="btn kyes" data-r="3">Nhớ rồi!</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Xong phiên -->
+  <section id="v-done" class="view" hidden>
+    <div class="wrap center">
+      <div id="done-art" class="done-art"></div>
+      <h2 id="done-title"></h2>
+      <p id="done-txt" class="muted"></p>
+      <p id="sync-txt" class="small"></p>
+      <button id="btn-home" class="btn primary big">Về trang chính</button>
+    </div>
+  </section>
+
+  <!-- Trang giáo viên -->
+  <section id="v-teacher" class="view" hidden>
+    <div class="wrap wide">
+      <header class="top">
+        <h2>Trang giáo viên</h2>
+        <a href="#" class="btn ghost small" id="t-back">Thoát</a>
+      </header>
+      <form id="f-teacher" class="card form">
+        <label>Mã giáo viên
+          <input id="in-tkey" type="password" required>
+        </label>
+        <button class="btn primary" type="submit">Xem tiến độ</button>
+        <p id="t-err" class="err" role="alert"></p>
+      </form>
+      <div id="t-out"></div>
+    </div>
+  </section>
+
+  <!-- Cài đặt máy chủ -->
+  <dialog id="dlg-server">
+    <form method="dialog" class="form">
+      <h3>Cài đặt máy chủ</h3>
+      <p class="small">Dán địa chỉ Web App của Google Apps Script (bắt đầu bằng https://script.google.com/). Để trống = chế độ DEMO.</p>
+      <input id="in-api" placeholder="https://script.google.com/macros/s/.../exec">
+      <div class="row">
+        <button value="cancel" class="btn ghost">Hủy</button>
+        <button value="ok" class="btn primary" id="btn-save-api">Lưu</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="vendor/ts-fsrs-6.0.0.umd.js"></script>
+  <script src="demo-cards.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
