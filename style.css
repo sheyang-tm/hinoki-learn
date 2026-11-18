@@ -6,8 +6,10 @@
   --jp: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; }
-body { background: var(--bg); color: var(--ink); font: 16px/1.5 var(--font); min-height: 100vh; -webkit-tap-highlight-color: transparent; }
+/* Điện thoại: chặn tự phóng to khi chạm đúp, chặn trình duyệt tự đổi cỡ chữ, không cho tràn ngang */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; touch-action: manipulation; overflow-x: hidden; }
+html, body { margin: 0; max-width: 100%; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.5 var(--font); min-height: 100vh; min-height: 100dvh; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
 [hidden] { display: none !important; }
 a { color: var(--info); }
 h1, h2, h3, h4 { margin: .2em 0 .4em; line-height: 1.25; }
@@ -22,7 +24,8 @@ h1, h2, h3, h4 { margin: .2em 0 .4em; line-height: 1.25; }
 .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
 .form { display: grid; gap: 12px; text-align: left; margin: 16px 0; }
 .form label { display: grid; gap: 4px; font-weight: 600; font-size: 14px; }
-input { font: inherit; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink); width: 100%; }
+/* Ô nhập phải >= 16px: nhỏ hơn thì iPhone tự phóng to khi chạm và không thu lại */
+input { font: inherit; font-size: 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink); width: 100%; }
 input:focus { outline: 2px solid var(--info); outline-offset: 1px; }
 .btn { font: inherit; border: 0; border-radius: 12px; padding: 10px 16px; cursor: pointer; background: #ece6d8; color: var(--ink); font-weight: 600; touch-action: manipulation; }
 .btn:disabled { opacity: .5; cursor: default; }
@@ -46,9 +49,10 @@ input:focus { outline: 2px solid var(--info); outline-offset: 1px; }
 /* Ôn thẻ */
 .progress { flex: 1; height: 8px; background: #ece6d8; border-radius: 999px; overflow: hidden; }
 #prog-bar { height: 100%; width: 0; background: var(--ok); transition: width .25s; }
-.flash { position: relative; min-height: 320px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; cursor: pointer; user-select: none; }
-.pic { font-size: 96px; line-height: 1.1; }
-.front { font-family: var(--jp); font-size: 64px; font-weight: 700; line-height: 1.2; word-break: keep-all; }
+.flash { position: relative; min-height: min(320px, 46dvh); padding: 20px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; cursor: pointer; user-select: none; }
+.pic { font-size: clamp(64px, 24vw, 96px); line-height: 1.1; }
+.front { font-family: var(--jp); font-size: clamp(36px, 14vw, 64px); font-weight: 700; line-height: 1.2; max-width: 100%; overflow-wrap: anywhere; }
+.mean, .ex, .read { max-width: 100%; overflow-wrap: anywhere; }
 .back { border-top: 1px dashed var(--line); padding-top: 12px; width: 100%; }
 .read { font-size: 20px; color: var(--muted); letter-spacing: .05em; }
 .mean { font-size: 24px; font-weight: 700; }
@@ -93,8 +97,8 @@ body.kid { --bg: #fff8ec; --accent: #ff8a3d; --radius: 28px; font-size: 18px; }
 body.kid .hero-kid { text-align: center; }
 body.kid .big-emoji { font-size: 80px; }
 body.kid .hero-kid p { font-size: 20px; font-weight: 700; margin: 0; }
-body.kid .front { font-size: 56px; color: #5a3e2b; }
-body.kid .pic { font-size: 120px; }
+body.kid .front { font-size: clamp(36px, 13vw, 56px); color: #5a3e2b; }
+body.kid .pic { font-size: clamp(80px, 30vw, 120px); }
 body.kid .btn.big { font-size: 22px; border-radius: 22px; }
 
 /* Trang giáo viên */
@@ -109,4 +113,4 @@ td.jp { font-family: var(--jp); font-size: 20px; }
 .sum { white-space: pre-wrap; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px; font-size: 13px; margin-top: 12px; overflow-x: auto; }
 dialog { border: 0; border-radius: var(--radius); box-shadow: var(--shadow); max-width: 92vw; width: 460px; }
 dialog::backdrop { background: rgba(0,0,0,.35); }
-@media (max-width: 380px) { .front { font-size: 52px; } .rate4 .btn { padding: 10px 2px; font-size: 14px; } }
+@media (max-width: 380px) { .rate4 .btn { padding: 10px 2px; font-size: 14px; } }

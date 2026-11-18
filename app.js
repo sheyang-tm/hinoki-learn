@@ -408,23 +408,59 @@ async function syncOnce() {
 }
 
 // ---------- Âm thanh ----------
+// Ưu tiên 1: file âm thanh thu sẵn (audio/index.json: { "chữ": "audio/ja/xxx.mp3" }).
+// Ưu tiên 2: giọng đọc của máy, chọn giọng tốt nhất có trên máy.
+let audioMap = {};
+let audioEl = null;
+function loadAudioIndex() {
+  fetch('audio/index.json', { cache: 'no-cache' })
+    .then((r) => (r.ok ? r.json() : {}))
+    .then((m) => { audioMap = m && typeof m === 'object' ? m : {}; })
+    .catch(() => { /* chưa có file âm thanh -> dùng giọng máy */ });
+}
+
 let jaVoice = null;
+// Điểm cao = giọng tự nhiên hơn. Giọng "compact"/eSpeak nghe như robot -> điểm thấp.
+function voiceScore(v) {
+  const n = (v.name + ' ' + v.voiceURI).toLowerCase();
+  let s = 0;
+  if (/natural|neural|online/.test(n)) s += 50;          // Edge/Windows: Nanami, Keita (Online, Natural)
+  if (/premium|enhanced|siri/.test(n)) s += 40;          // iPhone: giọng tải thêm chất lượng cao
+  if (/google/.test(n)) s += 30;                         // Chrome/Android: Google 日本語
+  if (/nanami|kyoko|o-ren|otoya|hattori|haruka|ayumi/.test(n)) s += 10;
+  if (/compact|espeak|robot/.test(n)) s -= 40;
+  if (v.localService === false) s += 5;
+  return s;
+}
 function pickVoice() {
   if (!('speechSynthesis' in window)) return;
-  const vs = speechSynthesis.getVoices();
-  jaVoice = vs.find((v) => /^ja(-|_|$)/i.test(v.lang)) || null;
+  const vs = speechSynthesis.getVoices().filter((v) => /^ja(-|_|$)/i.test(v.lang));
+  vs.sort((a, b) => voiceScore(b) - voiceScore(a));
+  jaVoice = vs[0] || null;
 }
 function speakWarmup() { try { if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.cancel(); } } catch (e) { /* bỏ qua */ } }
 function speak(c) {
-  if (!('speechSynthesis' in window)) return;
-  const text = c.doc_tieng || c.mat_truoc;
+  const text = (c.doc_tieng || c.mat_truoc || '').trim();
   if (!text) return;
+  const kid = App.hv && App.hv.giao_dien === 'kid';
+  try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) { /* bỏ qua */ }
+  if (audioEl) { audioEl.pause(); audioEl = null; }
+  const file = audioMap[text];
+  if (file) {
+    audioEl = new Audio(file);
+    audioEl.play().catch(() => speakTts(text, kid)); // không phát được file -> giọng máy
+    return;
+  }
+  speakTts(text, kid);
+}
+function speakTts(text, kid) {
+  if (!('speechSynthesis' in window)) return;
   try {
-    speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'ja-JP';
     if (jaVoice) u.voice = jaVoice;
-    u.rate = App.hv && App.hv.giao_dien === 'kid' ? 0.75 : 0.9;
+    // Đọc chậm quá làm giọng máy méo; giữ gần tốc độ thường
+    u.rate = kid ? 0.85 : 0.95;
     speechSynthesis.speak(u);
   } catch (e) { /* máy không hỗ trợ */ }
 }
@@ -562,6 +598,7 @@ function bind() {
 }
 
 initServer();
+loadAudioIndex();
 bind();
 route();
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
