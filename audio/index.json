@@ -1,1 +1,21 @@
-{}
+{
+ "あ": "audio/ja/c146ea5c0747922e.mp3",
+ "い": "audio/ja/0b97620116e2b719.mp3",
+ "う": "audio/ja/e72856eca4d7768e.mp3",
+ "え": "audio/ja/3a27586ef5546381.mp3",
+ "お": "audio/ja/ba69bed3b3fbe185.mp3",
+ "か": "audio/ja/3d3ed743bb8097f2.mp3",
+ "き": "audio/ja/54a68c08f81a7f8b.mp3",
+ "す": "audio/ja/362bf732e21b1913.mp3",
+ "すごい": "audio/ja/d2911dc3b4d7f205.mp3",
+ "ともだち": "audio/ja/72758aca71e8f7c3.mp3",
+ "がんばって": "audio/ja/0380e43a00fe8465.mp3",
+ "ありがとう": "audio/ja/fea84a28564610de.mp3",
+ "あか": "audio/ja/b449ea032b9c709a.mp3",
+ "あお": "audio/ja/f55571fa1d040f02.mp3",
+ "きいろ": "audio/ja/a5288e73d1614d22.mp3",
+ "みどり": "audio/ja/9b24d4a29a5c1800.mp3",
+ "しろ": "audio/ja/02c7bf83d0a2a6b3.mp3",
+ "いぬ": "audio/ja/dff258ea1e21c9cc.mp3",
+ "ねこ": "audio/ja/3cdfdfe036fcc84c.mp3"
+}
