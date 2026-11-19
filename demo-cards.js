@@ -20,6 +20,9 @@ window.HINOKI_DEMO = {
     { the_id: 'HV01-ANIME-002', ma_hv: 'HV01', bo_the: 'tu-anime', mat_truoc: 'ともだち', cach_doc: 'tomodachi', mat_sau: 'bạn bè', vi_du: 'Chủ đề tình bạn trong anime', hinh: '', doc_tieng: 'ともだち', tu_phat_am: false, buoi: 4 },
     { the_id: 'HV01-ANIME-003', ma_hv: 'HV01', bo_the: 'tu-anime', mat_truoc: 'がんばって', cach_doc: 'ganbatte', mat_sau: 'cố lên!', vi_du: 'Câu cổ vũ trước trận đấu', hinh: '', doc_tieng: 'がんばって', tu_phat_am: false, buoi: 4 },
     { the_id: 'HV01-ANIME-004', ma_hv: 'HV01', bo_the: 'tu-anime', mat_truoc: 'ありがとう', cach_doc: 'arigatou', mat_sau: 'cảm ơn', vi_du: '', hinh: '', doc_tieng: 'ありがとう', tu_phat_am: false, buoi: 4 },
+    // Thẻ Kanji mẫu: cach_doc = "On | Kun", mat_sau = "nghĩa | cách nhớ"
+    { the_id: 'HV01-KANJI-001', ma_hv: 'HV01', bo_the: 'kanji-01', mat_truoc: '学', cach_doc: 'ガク | まな(ぶ)', mat_sau: 'học | Ba nét trên mái nhà, đứa trẻ (子) ngồi dưới mái để học.', vi_du: 'がくせい (学生) — học sinh, sinh viên', hinh: '', doc_tieng: 'まなぶ', tu_phat_am: false, buoi: 5 },
+    { the_id: 'HV01-KANJI-002', ma_hv: 'HV01', bo_the: 'kanji-01', mat_truoc: '先', cach_doc: 'セン | さき', mat_sau: 'trước, đi trước | Người (儿) đi ở phía trước, đầu ngẩng lên.', vi_du: 'せんせい (先生) — thầy, cô giáo', hinh: '', doc_tieng: 'さき', tu_phat_am: false, buoi: 5 },
 
     // HV02 — 7 tuổi, chủ đề Màu sắc + Con vật, có hình, tự phát âm
     { the_id: 'HV02-MAU-001', ma_hv: 'HV02', bo_the: 'mau-sac', mat_truoc: 'あか', cach_doc: 'aka', mat_sau: 'màu đỏ', vi_du: '', hinh: '🔴', doc_tieng: 'あか', tu_phat_am: true, buoi: 8 },

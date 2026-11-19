@@ -9,7 +9,9 @@ const scheduler = F.fsrs(F.generatorParameters({ enable_fuzz: true, request_rete
 const FSRS_FIELDS = ['due', 'stability', 'difficulty', 'scheduled_days', 'learning_steps', 'reps', 'lapses', 'state', 'last_review'];
 const MAX_SESSION = { teen: 40, kid: 15 };
 const MAX_REPEAT_IN_SESSION = 3; // một thẻ quên lặp lại tối đa 3 lần trong 1 phiên
-const STICKERS = ['🌸', '⭐', '🐼', '🍙', '🚀', '🌈', '🐬', '🍓', '🦊', '🎈', '🐣', '🍀', '🐱', '🍉'];
+// Tên hiển thị cho bộ thẻ (cột bo_the). Không có trong bảng thì tự đổi: minna-03 -> "Minna Bài 3", kanji-03 -> "Kanji Bài 3".
+const DECK_NAMES = { hiragana: 'Hiragana', katakana: 'Katakana', 'mau-sac': 'Màu sắc', 'con-vat': 'Con vật', 'tu-anime': 'Từ anime', kanji: 'Kanji' };
+const WEEKDAYS = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
 // ---------- Tiện ích ----------
 const $ = (id) => document.getElementById(id);
@@ -219,16 +221,35 @@ async function loadData() {
 function saveCache() { LS.set(cacheKey(), { cards: App.cards, progress: App.progress, days: App.days }); }
 
 // ---------- Trang chủ ----------
-function counts() {
+// Loại thẻ kiểu Anki: new = chưa học, learn = đang học/vừa quên (FSRS state 1, 3), due = ôn (state 2)
+function kindOf(c) {
+  const p = App.progress[c.the_id];
+  if (!p) return 'new';
+  return Number(p.state) === 2 ? 'due' : 'learn';
+}
+function deckName(slug) {
+  const k = String(slug || '').trim().toLowerCase();
+  if (!k) return 'Khác';
+  if (DECK_NAMES[k]) return DECK_NAMES[k];
+  const m = k.match(/^(minna|kanji|kids)[-_ ]?0*(\d+)$/);
+  if (m) return m[1][0].toUpperCase() + m[1].slice(1) + ' Bài ' + m[2];
+  const t = k.replace(/[-_]+/g, ' ');
+  return t[0].toUpperCase() + t.slice(1);
+}
+const isKanjiDeck = (c) => /kanji/i.test(c.bo_the);
+
+function counts(deck) {
   const now = new Date(), today = ymd(now);
   const due = App.cards.filter((c) => App.progress[c.the_id] && new Date(App.progress[c.the_id].due) <= now);
   const newToday = Object.values(App.progress).filter((p) => p.first_review && ymd(new Date(p.first_review)) === today).length;
   const perDay = Number(App.hv.so_the_moi_ngay);
   const limit = Math.max(0, (Number.isFinite(perDay) ? perDay : 10) - newToday);
-  const fresh = App.cards.filter((c) => !App.progress[c.the_id])
+  // Giới hạn thẻ mới/ngày tính chung; bấm 1 bộ thì lấy thẻ mới của riêng bộ đó (như Anki)
+  const fresh = App.cards.filter((c) => !App.progress[c.the_id] && (deck == null || c.bo_the === deck))
     .sort((a, b) => a.buoi - b.buoi || a.the_id.localeCompare(b.the_id)).slice(0, limit);
   due.sort((a, b) => new Date(App.progress[a.the_id].due) - new Date(App.progress[b.the_id].due));
-  return { due, fresh };
+  if (deck == null) return { due, fresh };
+  return { due: due.filter((c) => c.bo_the === deck), fresh };
 }
 
 function streak(days) {
@@ -255,48 +276,76 @@ function renderHome(offline) {
   const kid = App.hv.giao_dien === 'kid';
   const { due, fresh } = counts();
   const st = streak(App.days);
-  $('st-due').textContent = due.length;
-  $('st-new').textContent = fresh.length;
-  $('st-streak').textContent = st;
   const total = Math.min(due.length + fresh.length, MAX_SESSION[kid ? 'kid' : 'teen']);
   // Thẻ mới thường hiện lại 1 lần trong phiên (bước học 10 phút) -> tính gấp đôi
   const reviews = Math.min(due.length, total) + Math.max(0, total - due.length) * 2;
   const mins = Math.max(1, Math.round(reviews * (kid ? 0.25 : 0.15)));
   const studiedToday = App.days.includes(ymd(new Date()));
-  $('home-hero').innerHTML = kid
-    ? `<div class="hero-kid"><div class="big-emoji">${studiedToday ? '🌟' : '🐼'}</div><p>${studiedToday ? 'Hôm nay bé đã học rồi. Giỏi lắm!' : 'Hôm nay mình học tiếng Nhật nhé!'}</p></div>`
-    : `<div class="hero-teen"><div class="flame${st ? ' on' : ''}">${st}</div><div><b>${st ? 'Chuỗi ' + st + ' ngày' : 'Bắt đầu chuỗi ngày học'}</b><p class="small">${studiedToday ? 'Hôm nay đã ôn. Giữ nhịp nhé.' : 'Ôn hôm nay để giữ chuỗi.'}</p></div></div>`;
-  $('btn-start').disabled = total === 0;
-  $('btn-start').textContent = total === 0 ? 'Hết thẻ cho hôm nay' : (kid ? 'Bắt đầu!' : `Bắt đầu ôn (${total} thẻ, ~${mins} phút)`);
+  const daySet = new Set(App.days);
+  if (kid) {
+    // Con dấu 済 cho từng ngày đã học trong tuần này (Thứ 2 -> Chủ nhật)
+    const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    let n = 0;
+    const cells = WEEKDAYS.map((w) => { const on = daySet.has(ymd(d)); if (on) n++; d.setDate(d.getDate() + 1); return `<i class="${on ? 'on' : ''}" title="${w}">${on ? '済' : w}</i>`; }).join('');
+    $('home-hero').innerHTML = `<div class="kid-hero"><div class="mascot">${studiedToday ? 'すごい!' : 'ねこ'}</div><p>${studiedToday ? 'Hôm nay bé đã học rồi. Giỏi lắm!' : (total ? `Hôm nay mình học ${total} thẻ nhé!` : 'Hôm nay bé nghỉ nhé!')}</p></div>
+      <div class="today"><div class="today-row"><b>Tuần này của bé</b><span class="streak"><strong>${n}</strong>/7 ngày · tổng ${App.days.length} ngày</span></div><div class="stamps">${cells}</div></div>`;
+    $('decks').hidden = true;
+  } else {
+    const cells = [];
+    for (let i = 13; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); cells.push(`<i class="${daySet.has(ymd(d)) ? 'on' : ''}${i === 0 ? ' now' : ''}" title="${ymd(d)}"></i>`); }
+    $('home-hero').innerHTML = `<div class="today"><div class="today-row"><b>${studiedToday ? 'Hôm nay đã ôn' : 'Hôm nay'}</b><span class="streak">${st ? `Chuỗi <strong>${st} ngày</strong>` : 'Ôn hôm nay để bắt đầu chuỗi'}</span></div><div class="heat" aria-label="14 ngày gần nhất">${cells.join('')}</div></div>`;
+    renderDecks(due, fresh);
+  }
+  const btn = $('btn-start');
+  btn.disabled = total === 0;
+  btn.innerHTML = total === 0 ? 'Xong hết cho hôm nay' : (kid ? 'Bắt đầu!' : `Học ngay<small>${total} thẻ · khoảng ${mins} phút</small>`);
   const pend = LS.get(queueKey(), []).length;
   if (offline && !App.cards.length) {
-    $('btn-start').textContent = 'Chưa tải được thẻ';
+    btn.textContent = 'Chưa tải được thẻ';
     $('home-note').textContent = 'Không kết nối được máy chủ và máy này chưa lưu thẻ nào. Bật mạng rồi mở lại app.';
-    renderPassport(kid);
     return;
   }
   $('home-note').textContent = (offline ? 'Đang ngoại tuyến — dùng dữ liệu đã lưu trên máy. ' : '') + (pend ? `${pend} lượt ôn chờ đồng bộ.` : '');
-  renderPassport(kid);
 }
 
-function renderPassport(kid) {
-  const p = $('passport');
-  p.hidden = !kid;
-  if (!kid) return;
-  const days = [...App.days].sort();
-  const cells = days.map((d, i) => `<div class="stamp" title="${esc(d)}">${STICKERS[i % STICKERS.length]}<small>${esc(d.slice(8))}/${esc(d.slice(5, 7))}</small></div>`).join('');
-  p.innerHTML = `<h3>Hộ chiếu của bé · ${days.length} ngày</h3><div class="stamps">${cells || '<p class="muted">Học xong hôm nay để nhận sticker đầu tiên!</p>'}</div>`;
+// Danh sách bộ thẻ kiểu Anki: 3 số Mới / Học / Ôn. Bấm 1 bộ = chỉ ôn bộ đó.
+function renderDecks(due, fresh) {
+  const box = $('decks');
+  const decks = {};
+  App.cards.forEach((c) => {
+    const d = decks[c.bo_the] = decks[c.bo_the] || { slug: c.bo_the, n: [0, 0, 0], size: 0, buoi: Infinity };
+    d.size++; d.buoi = Math.min(d.buoi, c.buoi || Infinity);
+  });
+  Object.values(decks).forEach((d) => { d.n[0] = counts(d.slug).fresh.length; });
+  due.forEach((c) => { decks[c.bo_the].n[kindOf(c) === 'learn' ? 1 : 2]++; });
+  const list = Object.values(decks).sort((a, b) => a.buoi - b.buoi || deckName(a.slug).localeCompare(deckName(b.slug), 'vi'));
+  box.hidden = !list.length;
+  box.innerHTML = '<div class="deck-head"><span>Bộ thẻ</span><span>Mới</span><span>Học</span><span>Ôn</span></div>' + list.map((d) => {
+    const any = d.n[0] + d.n[1] + d.n[2];
+    return `<button class="deck" type="button" data-deck="${esc(d.slug)}"${any ? '' : ' disabled'}><span class="deck-name"><b>${esc(deckName(d.slug))}</b><small>${d.size} thẻ</small></span>${d.n.map((x, k) => `<span class="n ${x ? ['new', 'learn', 'due'][k] : 'zero'}">${x}</span>`).join('')}</button>`;
+  }).join('');
 }
 
 // ---------- Ôn thẻ ----------
-function startSession() {
+function startSession(deck) {
   const kid = App.hv.giao_dien === 'kid';
-  const { due, fresh } = counts();
+  const { due, fresh } = counts(typeof deck === 'string' ? deck : null);
   App.queue = [...due, ...fresh].slice(0, MAX_SESSION[kid ? 'kid' : 'teen']);
   if (!App.queue.length) return;
-  App.session = { done: 0, again: 0, total: App.queue.length, repeats: {} };
+  App.session = { done: 0, again: 0, total: App.queue.length, repeats: {}, startedAt: Date.now() };
   show('review');
   nextCard();
+}
+
+// 3 số trên đầu như Anki: mới / đang học / ôn của phần còn lại, số của thẻ đang hiện được gạch chân
+function renderCounts(cur) {
+  const el = $('counts');
+  const left = [cur, ...App.queue];
+  if (App.hv.giao_dien === 'kid') { el.innerHTML = `<span class="c-kid">Còn ${left.length} thẻ</span>`; return; }
+  const n = { new: 0, learn: 0, due: 0 };
+  left.forEach((c) => { n[kindOf(c)]++; });
+  const k = kindOf(cur);
+  el.innerHTML = ['new', 'learn', 'due'].map((t) => `<span class="c-${t}${t === k ? ' cur' : ''}">${n[t]}</span>`).join('');
 }
 
 function nextCard() {
@@ -304,22 +353,38 @@ function nextCard() {
   const c = App.queue.shift();
   App.cur = c; App.flipped = false; App.shownAt = Date.now();
   const kid = App.hv.giao_dien === 'kid';
+  const kanji = isKanjiDeck(c);
+  $('c-deck').textContent = deckName(c.bo_the);
   $('c-pic').textContent = c.hinh || '';
   $('c-pic').hidden = !c.hinh;
+  const len = [...c.mat_truoc].length;
   $('c-front').textContent = c.mat_truoc;
-  $('c-read').textContent = c.cach_doc === c.mat_sau ? '' : c.cach_doc;
-  $('c-mean').textContent = c.mat_sau;
+  $('c-front').className = 'front' + (len > 8 ? ' longer' : len > 4 ? ' long' : '');
+  // Thẻ Kanji: cach_doc = "On | Kun", mat_sau = "nghĩa | cách nhớ" (README mục Thẻ Kanji)
+  const meanParts = kanji ? c.mat_sau.split('|').map((x) => x.trim()) : [c.mat_sau];
+  $('c-mean').textContent = meanParts[0];
+  if (kanji) {
+    const rd = c.cach_doc.split('|').map((x) => x.trim());
+    const rows = [['Âm On', rd[0] || '—', ''], ['Âm Kun', rd[1] || '—', '']];
+    if (meanParts.length > 1) rows.push(['Cách nhớ', meanParts.slice(1).join(' | '), 'vi']);
+    $('c-kanji').innerHTML = rows.map(([k, v, cls]) => `<dt>${k}</dt><dd class="${cls}">${esc(v)}</dd>`).join('');
+    $('c-read').textContent = '';
+  } else {
+    $('c-kanji').innerHTML = '';
+    $('c-read').textContent = c.cach_doc === c.mat_sau ? '' : c.cach_doc;
+  }
+  $('c-kanji').hidden = !kanji;
+  $('c-read').hidden = !$('c-read').textContent;
   $('c-ex').textContent = c.vi_du;
   $('c-back').hidden = true;
-  // "Cách viết" chỉ cho bảng chữ cái: bộ thẻ hiragana/katakana và 1-2 chữ kana (từ vựng như あか thì không)
-  $('btn-write').hidden = !(window.HinokiWrite && /^(hiragana|katakana)$/i.test(c.bo_the.trim()) && HinokiWrite.canWrite(c.mat_truoc));
+  // "Cách viết": bộ hiragana/katakana/kanji và có dữ liệu nét (kana-strokes.js). Từ vựng như あか thì không.
+  $('btn-write').hidden = !(window.HinokiWrite && /^(hiragana|katakana|kanji)/i.test(c.bo_the.trim()) && HinokiWrite.canWrite(c.mat_truoc));
   $('act-flip').hidden = false;
   $('act-rate4').hidden = true;
   $('act-rate2').hidden = true;
-  $('btn-flip').textContent = kid ? 'Xem đáp án' : 'Lật thẻ';
-  const done = App.session.done, total = done + App.queue.length + 1;
-  $('prog-bar').style.width = Math.round((done / total) * 100) + '%';
-  $('prog-txt').textContent = `${done}/${total}`;
+  $('flip-hint').hidden = kid;
+  $('btn-flip').textContent = kid ? 'Xem đáp án' : 'Hiện đáp án';
+  renderCounts(c);
   if (c.tu_phat_am) speak(c);
 }
 
@@ -375,18 +440,23 @@ function rate(r) {
 async function finishSession() {
   const kid = App.hv.giao_dien === 'kid';
   const st = streak(App.days);
+  const ses = App.session;
   show('done');
-  $('done-art').textContent = kid ? STICKERS[(App.days.length - 1 + STICKERS.length) % STICKERS.length] : '';
-  $('done-art').className = 'done-art' + (kid ? ' kid-art' : ' teen-art');
-  if (!kid) $('done-art').innerHTML = `<div class="flame on">${st}</div>`;
-  $('done-title').textContent = kid ? 'Bé nhận được sticker mới!' : 'Xong phiên ôn!';
+  // Đóng lại con dấu 済 (chạy lại hiệu ứng)
+  const art = $('done-art');
+  art.style.animation = 'none'; void art.offsetWidth; art.style.animation = '';
+  art.hidden = ses.done === 0;
+  $('done-title').textContent = ses.done === 0 ? 'Đã dừng' : (kid ? 'Giỏi lắm! Xong rồi!' : 'Xong phần hôm nay');
+  const left = counts().due.length;
   $('done-txt').textContent = kid
-    ? `Hôm nay bé đã ôn ${App.session.done} lượt. Hộ chiếu có ${App.days.length} sticker.`
-    : `${App.session.done} lượt ôn · ${App.session.again} lần quên · chuỗi ${st} ngày.`;
-  if (kid) chime(true);
+    ? (ses.done ? `Bé đã ôn ${ses.done} lượt. Tuần này có thêm 1 con dấu.` : '')
+    : (left ? `Còn ${left} thẻ đến hạn.` : `Chuỗi ${st} ngày. Hẹn mai ôn tiếp.`);
+  const mins = Math.max(1, Math.round((Date.now() - (ses.startedAt || Date.now())) / 60000));
+  $('done-sum').innerHTML = kid || !ses.done ? '' : `<div><b>${ses.done}</b><span>lượt ôn</span></div><div><b>${ses.again}</b><span>lần quên</span></div><div><b>${mins}</b><span>phút</span></div>`;
+  if (kid && ses.done) chime(true);
   $('sync-txt').textContent = 'Đang lưu kết quả...';
   const ok = await trySync();
-  $('sync-txt').textContent = ok ? 'Đã lưu kết quả.' : 'Chưa lưu lên máy chủ (mất mạng?). App sẽ tự lưu lại sau.';
+  $('sync-txt').textContent = ok ? 'Đã lưu kết quả cho giáo viên.' : 'Chưa lưu lên máy chủ (mất mạng?). App sẽ tự lưu lại sau.';
 }
 
 // Đồng bộ nối đuôi nhau: lần gọi sau chờ lần trước xong rồi gửi phần còn lại
@@ -569,13 +639,14 @@ function route() {
 function bind() {
   $('f-login').addEventListener('submit', doLogin);
   $('btn-logout').addEventListener('click', logout);
-  $('btn-start').addEventListener('click', startSession);
+  $('btn-start').addEventListener('click', () => startSession());
+  $('decks').addEventListener('click', (e) => { const b = e.target.closest('[data-deck]'); if (b && !b.disabled) startSession(b.dataset.deck); });
   $('btn-flip').addEventListener('click', flip);
   $('flash').addEventListener('click', (e) => { if (!e.target.closest('button')) flip(); });
   $('btn-write').addEventListener('click', () => App.cur && window.HinokiWrite && HinokiWrite.open(App.cur.mat_truoc));
   $('btn-speak').addEventListener('click', () => App.cur && speak(App.cur));
   document.querySelectorAll('#act-rate4 button, #act-rate2 button').forEach((b) => b.addEventListener('click', () => rate(Number(b.dataset.r))));
-  $('btn-quit').addEventListener('click', () => { App.queue = []; finishSession(); });
+  $('btn-quit').addEventListener('click', () => { App.queue = []; App.cur = null; finishSession(); });
   $('btn-home').addEventListener('click', () => openHome());
   $('f-teacher').addEventListener('submit', doTeacher);
   // pushState không kích hoạt hashchange -> chỉ gọi route() 1 lần

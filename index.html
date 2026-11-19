@@ -4,12 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Hinoki Learn</title>
-  <meta name="theme-color" content="#1f2a44">
+  <meta name="theme-color" content="#2f5d46">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Hinoki Learn">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Klee+One:wght@600&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -36,67 +39,76 @@
   </section>
 
   <!-- Trang chủ học viên -->
-  <section id="v-home" class="view" hidden>
-    <div class="wrap">
-      <header class="top">
-        <span id="home-ma" class="chip"></span>
-        <button id="btn-logout" class="btn ghost small">Đăng xuất</button>
-      </header>
-      <div id="home-hero" class="hero card"></div>
-      <div class="stats">
-        <div class="stat"><b id="st-due">0</b><span>thẻ cần ôn</span></div>
-        <div class="stat"><b id="st-new">0</b><span>thẻ mới</span></div>
-        <div class="stat"><b id="st-streak">0</b><span>ngày liên tục</span></div>
-      </div>
-      <button id="btn-start" class="btn primary big">Bắt đầu ôn</button>
-      <p id="home-note" class="muted center"></p>
-      <div id="passport" class="passport" hidden></div>
+  <section id="v-home" class="view app-view" hidden>
+    <header class="app-top">
+      <div class="brand"><span class="seal" aria-hidden="true">檜</span><span>Hinoki Learn</span></div>
+      <span id="home-ma" class="chip"></span>
+      <button id="btn-logout" class="icon-btn" type="button">Đăng xuất</button>
+    </header>
+    <div class="app-scroll">
+      <div id="home-hero"></div>
+      <div id="decks" class="decks"></div>
+      <p id="home-note" class="muted center small"></p>
+    </div>
+    <div class="app-bottom">
+      <button id="btn-start" class="cta" type="button">Học ngay</button>
     </div>
   </section>
 
   <!-- Ôn thẻ -->
-  <section id="v-review" class="view" hidden>
-    <div class="wrap">
-      <header class="top">
-        <button id="btn-quit" class="btn ghost small">Dừng</button>
-        <div class="progress"><div id="prog-bar"></div></div>
-        <span id="prog-txt" class="small"></span>
-      </header>
-      <div id="flash" class="flash card" tabindex="0">
-        <div id="c-pic" class="pic"></div>
-        <div id="c-front" class="front"></div>
-        <div id="c-back" class="back" hidden>
-          <div id="c-read" class="read"></div>
-          <div id="c-mean" class="mean"></div>
-          <div id="c-ex" class="ex"></div>
-        </div>
-        <button id="btn-speak" class="btn ghost speak" aria-label="Nghe phát âm">Nghe</button>
-        <button id="btn-write" class="btn ghost write" aria-label="Xem cách viết chữ" hidden>Cách viết</button>
+  <section id="v-review" class="view app-view" hidden>
+    <header class="app-top">
+      <button id="btn-quit" class="icon-btn" type="button" aria-label="Dừng, về trang chính"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>Dừng</button>
+      <div id="counts" class="counts" aria-label="Thẻ mới, đang học, cần ôn"></div>
+      <span class="top-spacer"></span>
+    </header>
+    <div id="flash" class="flash" tabindex="0">
+      <span id="c-deck" class="deck-tag"></span>
+      <div id="c-pic" class="pic"></div>
+      <div id="c-front" class="front"></div>
+      <div id="c-back" class="back" hidden>
+        <div id="c-read" class="read"></div>
+        <div id="c-mean" class="mean"></div>
+        <dl id="c-kanji" class="kanji-meta" hidden></dl>
+        <div id="c-ex" class="ex"></div>
       </div>
-      <div id="act-flip" class="actions">
-        <button id="btn-flip" class="btn primary big">Lật thẻ</button>
+    </div>
+    <div class="tools">
+      <button id="btn-speak" class="icon-btn boxed" type="button" aria-label="Nghe phát âm"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>Nghe</button>
+      <button id="btn-write" class="icon-btn boxed" type="button" aria-label="Xem cách viết chữ" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4z"/><path d="M14 6l3 3"/></svg>Cách viết</button>
+    </div>
+    <div class="app-bottom plain">
+      <div id="act-flip">
+        <p id="flip-hint" class="hint">Nghĩ ra nghĩa trước, rồi mới lật</p>
+        <button id="btn-flip" class="cta soft" type="button">Hiện đáp án</button>
       </div>
-      <div id="act-rate4" class="actions rate4" hidden>
-        <button class="btn r1" data-r="1"><b>Quên</b><small>Again</small><i></i></button>
-        <button class="btn r2" data-r="2"><b>Khó</b><small>Hard</small><i></i></button>
-        <button class="btn r3" data-r="3"><b>Được</b><small>Good</small><i></i></button>
-        <button class="btn r4" data-r="4"><b>Dễ</b><small>Easy</small><i></i></button>
+      <div id="act-rate4" class="rate4" hidden>
+        <button class="g1" type="button" data-r="1"><b>Quên</b><i></i></button>
+        <button class="g2" type="button" data-r="2"><b>Khó</b><i></i></button>
+        <button class="g3" type="button" data-r="3"><b>Được</b><i></i></button>
+        <button class="g4" type="button" data-r="4"><b>Dễ</b><i></i></button>
       </div>
-      <div id="act-rate2" class="actions rate2" hidden>
-        <button class="btn kno" data-r="1">Chưa nhớ</button>
-        <button class="btn kyes" data-r="3">Nhớ rồi!</button>
+      <div id="act-rate2" class="rate2" hidden>
+        <button class="kno" type="button" data-r="1">Chưa nhớ</button>
+        <button class="kyes" type="button" data-r="3">Nhớ rồi!</button>
       </div>
     </div>
   </section>
 
   <!-- Xong phiên -->
-  <section id="v-done" class="view" hidden>
-    <div class="wrap center">
-      <div id="done-art" class="done-art"></div>
+  <section id="v-done" class="view app-view" hidden>
+    <header class="app-top">
+      <div class="brand"><span class="seal" aria-hidden="true">檜</span><span>Hinoki Learn</span></div>
+    </header>
+    <div class="done">
+      <div id="done-art" class="hanko" aria-hidden="true">済</div>
       <h2 id="done-title"></h2>
       <p id="done-txt" class="muted"></p>
-      <p id="sync-txt" class="small"></p>
-      <button id="btn-home" class="btn primary big">Về trang chính</button>
+      <div id="done-sum" class="sum"></div>
+      <p id="sync-txt" class="small muted"></p>
+    </div>
+    <div class="app-bottom plain">
+      <button id="btn-home" class="cta" type="button">Về trang chính</button>
     </div>
   </section>
 
