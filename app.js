@@ -311,6 +311,8 @@ function nextCard() {
   $('c-mean').textContent = c.mat_sau;
   $('c-ex').textContent = c.vi_du;
   $('c-back').hidden = true;
+  // "Cách viết" chỉ cho bảng chữ cái: bộ thẻ hiragana/katakana và 1-2 chữ kana (từ vựng như あか thì không)
+  $('btn-write').hidden = !(window.HinokiWrite && /^(hiragana|katakana)$/i.test(c.bo_the.trim()) && HinokiWrite.canWrite(c.mat_truoc));
   $('act-flip').hidden = false;
   $('act-rate4').hidden = true;
   $('act-rate2').hidden = true;
@@ -569,7 +571,8 @@ function bind() {
   $('btn-logout').addEventListener('click', logout);
   $('btn-start').addEventListener('click', startSession);
   $('btn-flip').addEventListener('click', flip);
-  $('flash').addEventListener('click', (e) => { if (e.target.id !== 'btn-speak') flip(); });
+  $('flash').addEventListener('click', (e) => { if (!e.target.closest('button')) flip(); });
+  $('btn-write').addEventListener('click', () => App.cur && window.HinokiWrite && HinokiWrite.open(App.cur.mat_truoc));
   $('btn-speak').addEventListener('click', () => App.cur && speak(App.cur));
   document.querySelectorAll('#act-rate4 button, #act-rate2 button').forEach((b) => b.addEventListener('click', () => rate(Number(b.dataset.r))));
   $('btn-quit').addEventListener('click', () => { App.queue = []; finishSession(); });
@@ -590,6 +593,7 @@ function bind() {
   window.addEventListener('online', () => trySync());
   document.addEventListener('keydown', (e) => {
     if (document.body.dataset.view !== 'review') return;
+    if (window.HinokiWrite && HinokiWrite.isOpen()) return; // đang mở "Cách viết"
     if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flip(); return; }
     const kid = App.hv && App.hv.giao_dien === 'kid';
     if (App.flipped && /^[1-4]$/.test(e.key)) { const r = Number(e.key); if (!kid || r === 1 || r === 3) rate(r); }

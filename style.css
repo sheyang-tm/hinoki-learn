@@ -114,3 +114,22 @@ td.jp { font-family: var(--jp); font-size: 20px; }
 dialog { border: 0; border-radius: var(--radius); box-shadow: var(--shadow); max-width: 92vw; width: 460px; }
 dialog::backdrop { background: rgba(0,0,0,.35); }
 @media (max-width: 380px) { .rate4 .btn { padding: 10px 2px; font-size: 14px; } }
+
+/* Cách viết (viet-chu.js): xem thứ tự nét + tự tô */
+.write { position: absolute; top: 10px; left: 10px; font-size: 14px; }
+#dlg-write { width: 420px; padding: 16px; background: var(--card); color: var(--ink); }
+.w-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.w-boxes { display: grid; grid-template-columns: 1fr; gap: 10px; justify-items: center; }
+.w-boxes.two { grid-template-columns: 1fr 1fr; }
+.w-box { position: relative; width: 100%; max-width: 300px; aspect-ratio: 1; background: #fff; border-radius: 12px; }
+.w-box svg, .w-pad { position: absolute; inset: 0; width: 100%; height: 100%; }
+.w-pad { touch-action: none; cursor: crosshair; }
+.w-frame { fill: none; stroke: #d8cfbd; stroke-width: 1; }
+.w-guide { stroke: #d8cfbd; stroke-width: .6; stroke-dasharray: 3 3; }
+.w-ghost path { fill: none; stroke: #e7e1d4; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.w-live path { fill: none; stroke: #1f2a44; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.w-nums text { font: 700 7px var(--font); fill: #2f6db3; opacity: 0; transition: opacity .2s; }
+.w-nums text.on { opacity: 1; }
+.w-hint { text-align: center; margin: 10px 0 6px; min-height: 1.5em; }
+.w-acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.w-src { text-align: center; margin: 8px 0 0; font-size: 11px; }
