@@ -525,7 +525,8 @@ function flip() {
   const kid = App.hv.giao_dien === 'kid';
   $('c-back').hidden = false;
   $('act-flip').hidden = true;
-  if (kid) { $('act-rate2').hidden = false; speak(App.cur); return; }
+  // Thẻ đã đọc (tự đọc lúc hiện hoặc đã bấm Nghe) thì lật không đọc lại: nghe 2-3 lần một từ rất khó chịu
+  if (kid) { $('act-rate2').hidden = false; if (App.spoken !== App.cur.the_id) speak(App.cur); return; }
   $('act-rate4').hidden = false;
   // Hiện khoảng thời gian tới lần ôn sau trên mỗi nút
   try {
@@ -676,6 +677,7 @@ function speakWarmup() { try { if ('speechSynthesis' in window) { pickVoice(); s
 function speak(c) {
   const text = (c.doc_tieng || c.mat_truoc || '').trim();
   if (!text) return;
+  App.spoken = c.the_id;
   const kid = App.hv && App.hv.giao_dien === 'kid';
   try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) { /* bỏ qua */ }
   if (audioEl) { audioEl.pause(); audioEl = null; }

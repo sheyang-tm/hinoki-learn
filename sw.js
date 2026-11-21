@@ -1,6 +1,6 @@
 // Service worker: lưu khung app để mở được khi mất mạng.
 // Đổi VERSION mỗi lần cập nhật code để máy học viên nhận bản mới.
-const VERSION = 'hinoki-learn-v11';
+const VERSION = 'hinoki-learn-v12';
 const FONT_CACHE = 'hinoki-fonts-v1'; // không xóa khi đổi VERSION
 // Giọng đọc: tên file mp3 = mã băm của chữ (tools/tao-giong.js) -> file không đổi, lưu luôn, không hỏi lại mạng.
 // Tạo lại 1 file cùng tên (vd sửa file câm) thì đổi số AUDIO_CACHE để máy học viên tải lại.
