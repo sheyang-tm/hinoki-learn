@@ -1,6 +1,6 @@
 // Service worker: lưu khung app để mở được khi mất mạng.
 // Đổi VERSION mỗi lần cập nhật code để máy học viên nhận bản mới.
-const VERSION = 'hinoki-learn-v7';
+const VERSION = 'hinoki-learn-v8';
 const FONT_CACHE = 'hinoki-fonts-v1'; // không xóa khi đổi VERSION
 const FILES = ['./', 'index.html', 'style.css', 'app.js', 'demo-cards.js', 'kana-strokes.js', 'viet-chu.js', 'vendor/ts-fsrs-6.0.0.umd.js', 'manifest.json', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'];
 

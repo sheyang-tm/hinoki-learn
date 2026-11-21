@@ -231,6 +231,8 @@ function deckName(slug) {
   const k = String(slug || '').trim().toLowerCase();
   if (!k) return 'Khác';
   if (DECK_NAMES[k]) return DECK_NAMES[k];
+  const jlpt = k.match(/^kanji[-_ ]?n([1-5])$/); // kanji-n5 -> "Kanji N5" (thẻ tạo bằng tools/kanji-the-app.py)
+  if (jlpt) return 'Kanji N' + jlpt[1];
   const m = k.match(/^(minna|kanji|kids)[-_ ]?0*(\d+)$/);
   if (m) return m[1][0].toUpperCase() + m[1].slice(1) + ' Bài ' + m[2];
   const t = k.replace(/[-_]+/g, ' ');
