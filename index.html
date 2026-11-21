@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Hinoki Learn</title>
+  <title>Hinoki</title>
   <meta name="theme-color" content="#2f5d46">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Hinoki Learn">
+  <meta name="apple-mobile-web-app-title" content="Hinoki">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Klee+One:wght@600&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap">
-  <!-- ?v=9: đổi cùng VERSION trong sw.js, để trình duyệt không trộn file cũ với file mới -->
-  <link rel="stylesheet" href="style.css?v=9">
+  <!-- ?v=10: đổi cùng VERSION trong sw.js, để trình duyệt không trộn file cũ với file mới -->
+  <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
   <div id="banner" class="banner" hidden></div>
@@ -23,7 +23,7 @@
   <section id="v-login" class="view">
     <div class="wrap center">
       <img src="icons/icon.svg" alt="" class="logo">
-      <h1>Hinoki Learn</h1>
+      <h1>Hinoki</h1>
       <p class="muted">Ôn tiếng Nhật mỗi ngày 5-10 phút</p>
       <form id="f-login" class="card form" autocomplete="off">
         <label>Mã học viên
@@ -42,7 +42,7 @@
   <!-- Trang chủ học viên -->
   <section id="v-home" class="view app-view" hidden>
     <header class="app-top">
-      <div class="brand"><span class="seal" aria-hidden="true">檜</span><span>Hinoki Learn</span></div>
+      <div class="brand"><span class="seal" aria-hidden="true">檜</span><span>Hinoki</span></div>
       <span id="home-ma" class="chip"></span>
       <button id="btn-logout" class="icon-btn" type="button">Đăng xuất</button>
     </header>
@@ -99,13 +99,14 @@
   <!-- Xong phiên -->
   <section id="v-done" class="view app-view" hidden>
     <header class="app-top">
-      <div class="brand"><span class="seal" aria-hidden="true">檜</span><span>Hinoki Learn</span></div>
+      <div class="brand"><span class="seal" aria-hidden="true">檜</span><span>Hinoki</span></div>
     </header>
     <div class="done">
       <div id="done-art" class="hanko" aria-hidden="true">済</div>
       <h2 id="done-title"></h2>
       <p id="done-txt" class="muted"></p>
       <div id="done-sum" class="sum"></div>
+      <div id="done-badge" hidden></div>
       <p id="sync-txt" class="small muted"></p>
     </div>
     <div class="app-bottom plain">
@@ -144,10 +145,10 @@
     </form>
   </dialog>
 
-  <script src="vendor/ts-fsrs-6.0.0.umd.js?v=9"></script>
-  <script src="demo-cards.js?v=9"></script>
-  <script src="kana-strokes.js?v=9"></script>
-  <script src="viet-chu.js?v=9"></script>
-  <script src="app.js?v=9"></script>
+  <script src="vendor/ts-fsrs-6.0.0.umd.js?v=10"></script>
+  <script src="demo-cards.js?v=10"></script>
+  <script src="kana-strokes.js?v=10"></script>
+  <script src="viet-chu.js?v=10"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>
